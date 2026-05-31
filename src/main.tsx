@@ -1,12 +1,12 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import App from './App.tsx'
-import AnswerViewer from './AnswerViewer.tsx'
-import Home from './Home.tsx'
-import QuestionList from './QuestionList.tsx'
-import QuestionViewer from './QuestionViewer.tsx'
-import AuthWrapper from './AuthWrapper.tsx'
+import App from './App'
+import AnswerViewer from './AnswerViewer'
+import Home from './Home'
+import QuestionList from './QuestionList'
+import QuestionViewer from './QuestionViewer'
+import AuthWrapper from './AuthWrapper'
 import './index.css'
 
 createRoot(document.getElementById('root')!).render(
