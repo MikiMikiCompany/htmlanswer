@@ -40,8 +40,8 @@ function getSubjectName(subject: string) {
 function getUserName(target: string) {
   let name = target.replace(/_/g, ' ');
   name = name.replace(/user1/g, 'チャンココ');
-  name = name.replace(/user2/g, 'ゆず');
-  name = name.replace(/user3/g, 'ルチア');
+  name = name.replace(/user2/g, 'へー');
+  name = name.replace(/user3/g, 'みき');
   return name;
 }
 
