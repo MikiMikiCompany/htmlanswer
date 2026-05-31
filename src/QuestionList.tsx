@@ -105,16 +105,16 @@ export default function QuestionList() {
       </header>
 
       <main className="main-content">
-        <div className="controls flex flex-col sm:flex-row items-center gap-4 bg-white p-4 rounded-xl shadow-sm mb-6 border border-gray-100">
-          <div className="flex items-center gap-2 text-gray-700 font-medium">
-            <Calendar size={20} className="text-blue-500" />
+        <div className="controls" style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '1rem', background: 'white', padding: '1rem', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', marginBottom: '1.5rem', border: '1px solid #f3f4f6' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#374151', fontWeight: 500 }}>
+            <Calendar size={20} color="#3b82f6" />
             <span>日付選択:</span>
           </div>
           
           <select 
             value={filterDate}
             onChange={(e) => setFilterDate(e.target.value)}
-            className="flex-1 min-w-[150px] p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all bg-gray-50 hover:bg-white"
+            style={{ flex: 1, minWidth: '150px', padding: '0.5rem', border: '1px solid #d1d5db', borderRadius: '8px', outline: 'none', background: '#f9fafb', color: '#1f2937' }}
           >
             <optgroup label="最近">
               {past7Days.map(d => (
@@ -130,7 +130,7 @@ export default function QuestionList() {
               type="date" 
               value={customDate}
               onChange={(e) => setCustomDate(e.target.value)}
-              className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+              style={{ flex: 1, padding: '0.5rem', border: '1px solid #d1d5db', borderRadius: '8px', outline: 'none', color: '#1f2937' }}
             />
           )}
         </div>

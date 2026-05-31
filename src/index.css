@@ -342,3 +342,106 @@ h1 {
     grid-template-columns: 1fr;
   }
 }
+
+/* Home Menu Cards */
+.home-menu-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto;
+  min-height: 60vh;
+  padding: 1rem;
+}
+
+.home-card {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background: white;
+  border-radius: 2rem;
+  padding: 2rem;
+  text-decoration: none;
+  color: var(--text-main);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border: 4px solid transparent;
+  gap: 2rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.home-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 30px rgba(0,0,0,0.1);
+}
+
+.home-card.blue:hover { border-color: #93c5fd; }
+.home-card.red:hover { border-color: #fca5a5; }
+
+.home-icon-box {
+  width: 100px;
+  height: 100px;
+  flex-shrink: 0;
+  border-radius: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s;
+}
+
+.home-card:hover .home-icon-box {
+  transform: scale(1.05);
+}
+
+.home-card.blue .home-icon-box {
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+}
+
+.home-card.red .home-icon-box {
+  background: linear-gradient(135deg, #fef2f2, #fee2e2);
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+.home-card-content {
+  flex: 1;
+}
+
+.home-card-content h2 {
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  color: #1f2937;
+  letter-spacing: -0.02em;
+}
+
+.home-card-content p {
+  font-size: 1.1rem;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+.home-card-arrow {
+  color: #d1d5db;
+  transition: color 0.3s;
+}
+
+.home-card.blue:hover .home-card-arrow { color: #60a5fa; }
+.home-card.red:hover .home-card-arrow { color: #f87171; }
+
+@media (max-width: 640px) {
+  .home-card {
+    flex-direction: column;
+    text-align: center;
+    padding: 1.5rem;
+    gap: 1rem;
+  }
+  .home-card-arrow { display: none; }
+}
