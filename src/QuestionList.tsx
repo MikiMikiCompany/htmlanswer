@@ -8,6 +8,7 @@ import './index.css';
 interface QuestionFile {
   id: string;
   date: string;
+  rawDate?: string;
   subject: string;
   target: string;
   isToday: boolean;
@@ -15,8 +16,23 @@ interface QuestionFile {
 
 export default function QuestionList() {
   const [files, setFiles] = useState<QuestionFile[]>([]);
-  const [showOnlyToday, setShowOnlyToday] = useState(true);
+  const [filterDate, setFilterDate] = useState<string>('TODAY');
+  const [customDate, setCustomDate] = useState<string>('');
   const [loading, setLoading] = useState(true);
+
+  // Generate past 7 days options
+  const past7Days = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return {
+      value: `${yyyy}${mm}${dd}`,
+      label: i === 0 ? '本日' : i === 1 ? '昨日' : `${i}日前`,
+      dateStr: `${yyyy}/${mm}/${dd}`
+    };
+  });
 
   useEffect(() => {
     const fetchQuestions = async () => {
@@ -24,8 +40,7 @@ export default function QuestionList() {
         const q = query(collection(db, 'questions'), orderBy('timestamp', 'desc'));
         const querySnapshot = await getDocs(q);
         
-        const today = new Date();
-        const todayStr = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
+        const todayStr = past7Days[0].value;
         
         const fetchedFiles: QuestionFile[] = [];
         querySnapshot.forEach((doc) => {
@@ -36,6 +51,7 @@ export default function QuestionList() {
           fetchedFiles.push({
             id: doc.id,
             date: displayDate,
+            rawDate: rawDate,
             subject: data.subject || '',
             target: data.target || '',
             isToday: rawDate === todayStr,
@@ -53,7 +69,20 @@ export default function QuestionList() {
     fetchQuestions();
   }, []);
 
-  const displayFiles = showOnlyToday ? files.filter(f => f.isToday) : files;
+  // Use useEffect to set TODAY value initially
+  useEffect(() => {
+    setFilterDate(past7Days[0].value);
+  }, []);
+
+  const displayFiles = files.filter(f => {
+    if (filterDate === 'ALL') return true;
+    if (filterDate === 'CUSTOM') {
+      if (!customDate) return true;
+      const customYYYYMMDD = customDate.replace(/-/g, '');
+      return f.rawDate === customYYYYMMDD;
+    }
+    return f.rawDate === filterDate;
+  });
 
   return (
     <div className="app-container">
@@ -76,19 +105,34 @@ export default function QuestionList() {
       </header>
 
       <main className="main-content">
-        <div className="controls">
-          <div className="filter-toggle" onClick={() => setShowOnlyToday(!showOnlyToday)}>
-            <div className={`toggle-btn ${showOnlyToday ? 'active' : ''}`}>
-              本日の問題
-            </div>
-            <div className={`toggle-btn ${!showOnlyToday ? 'active' : ''}`}>
-              すべての問題
-            </div>
+        <div className="controls flex flex-col sm:flex-row items-center gap-4 bg-white p-4 rounded-xl shadow-sm mb-6 border border-gray-100">
+          <div className="flex items-center gap-2 text-gray-700 font-medium">
+            <Calendar size={20} className="text-blue-500" />
+            <span>日付選択:</span>
           </div>
-          <div className="date-indicator">
-            <Calendar size={18} />
-            <span>{new Date().toLocaleDateString('ja-JP')}</span>
-          </div>
+          
+          <select 
+            value={filterDate}
+            onChange={(e) => setFilterDate(e.target.value)}
+            className="flex-1 min-w-[150px] p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all bg-gray-50 hover:bg-white"
+          >
+            <optgroup label="最近">
+              {past7Days.map(d => (
+                <option key={d.value} value={d.value}>{d.label} ({d.dateStr})</option>
+              ))}
+            </optgroup>
+            <option value="ALL">すべて表示</option>
+            <option value="CUSTOM">任意の日付...</option>
+          </select>
+
+          {filterDate === 'CUSTOM' && (
+            <input 
+              type="date" 
+              value={customDate}
+              onChange={(e) => setCustomDate(e.target.value)}
+              className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+            />
+          )}
         </div>
 
         {loading ? (
