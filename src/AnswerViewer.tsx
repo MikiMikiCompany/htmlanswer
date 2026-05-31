@@ -3,14 +3,26 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from './firebase';
 import { ArrowLeft } from 'lucide-react';
+import PasswordLock from './PasswordLock';
 
 export default function AnswerViewer() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [htmlContent, setHtmlContent] = useState<string>('');
   const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
+    // Check if unlocked today
+    const todayStr = new Date().toISOString().split('T')[0];
+    const unlockedDate = localStorage.getItem('unlocked_date');
+    if (unlockedDate === todayStr) {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
     const fetchContent = async () => {
       if (!id) return;
       try {
@@ -29,7 +41,11 @@ export default function AnswerViewer() {
       }
     };
     fetchContent();
-  }, [id]);
+  }, [id, isAuthenticated]);
+
+  if (!isAuthenticated) {
+    return <PasswordLock onUnlock={() => setIsAuthenticated(true)} />;
+  }
 
   if (loading) {
     return (
