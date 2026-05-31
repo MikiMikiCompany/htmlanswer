@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from './firebase';
 import { ArrowLeft } from 'lucide-react';
-import PasswordLock from './PasswordLock';
 
 export default function AnswerViewer() {
   const { id } = useParams();
