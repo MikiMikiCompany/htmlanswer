@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import { FileText, Calendar, BookOpen, GraduationCap, ChevronRight } from 'lucide-react';
+import { BookOpen, Calendar, ChevronRight } from 'lucide-react';
 import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 import { Link } from 'react-router-dom';
 import { db } from './firebase';
 import './index.css';
 
-interface AnswerFile {
+interface QuestionFile {
   id: string;
   date: string;
   subject: string;
@@ -13,53 +13,21 @@ interface AnswerFile {
   isToday: boolean;
 }
 
-function getSubjectIcon(subject: string) {
-  switch (subject.toLowerCase()) {
-    case 'english':
-    case 'vocab':
-      return <BookOpen className="subject-icon text-blue-500" />;
-    case 'math':
-      return <GraduationCap className="subject-icon text-purple-500" />;
-    case 'kanji':
-      return <FileText className="subject-icon text-red-500" />;
-    default:
-      return <FileText className="subject-icon text-gray-500" />;
-  }
-}
-
-function getSubjectName(subject: string) {
-  switch (subject.toLowerCase()) {
-    case 'english': return '英語';
-    case 'vocab': return '英単語';
-    case 'math': return '算数';
-    case 'kanji': return '漢字';
-    default: return subject;
-  }
-}
-
-function getUserName(target: string) {
-  let name = target.replace(/_/g, ' ');
-  name = name.replace(/user1/g, 'チャンココ');
-  name = name.replace(/user2/g, 'へー');
-  name = name.replace(/user3/g, 'みき');
-  return name;
-}
-
-function App() {
-  const [files, setFiles] = useState<AnswerFile[]>([]);
+export default function QuestionList() {
+  const [files, setFiles] = useState<QuestionFile[]>([]);
   const [showOnlyToday, setShowOnlyToday] = useState(true);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchAnswers = async () => {
+    const fetchQuestions = async () => {
       try {
-        const q = query(collection(db, 'answers'), orderBy('timestamp', 'desc'));
+        const q = query(collection(db, 'questions'), orderBy('timestamp', 'desc'));
         const querySnapshot = await getDocs(q);
         
         const today = new Date();
         const todayStr = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
         
-        const fetchedFiles: AnswerFile[] = [];
+        const fetchedFiles: QuestionFile[] = [];
         querySnapshot.forEach((doc) => {
           const data = doc.data();
           const rawDate = data.date || '';
@@ -76,13 +44,13 @@ function App() {
         
         setFiles(fetchedFiles);
       } catch (e) {
-        console.error("Error fetching answers:", e);
+        console.error("Error fetching questions:", e);
       } finally {
         setLoading(false);
       }
     };
     
-    fetchAnswers();
+    fetchQuestions();
   }, []);
 
   const displayFiles = showOnlyToday ? files.filter(f => f.isToday) : files;
@@ -100,10 +68,10 @@ function App() {
             <Link to="/" className="text-white mr-4 hover:opacity-80">
               ← 戻る
             </Link>
-            <div className="logo-icon">✨</div>
-            <h1>解答メニュー</h1>
+            <div className="logo-icon">🎧</div>
+            <h1>問題メニュー</h1>
           </div>
-          <p className="subtitle">学習の解答を確認します</p>
+          <p className="subtitle">リスニング問題などに挑戦しましょう</p>
         </div>
       </header>
 
@@ -111,10 +79,10 @@ function App() {
         <div className="controls">
           <div className="filter-toggle" onClick={() => setShowOnlyToday(!showOnlyToday)}>
             <div className={`toggle-btn ${showOnlyToday ? 'active' : ''}`}>
-              本日の解答
+              本日の問題
             </div>
             <div className={`toggle-btn ${!showOnlyToday ? 'active' : ''}`}>
-              すべての解答
+              すべての問題
             </div>
           </div>
           <div className="date-indicator">
@@ -130,24 +98,23 @@ function App() {
         ) : displayFiles.length === 0 ? (
           <div className="empty-state">
             <div className="empty-icon">📝</div>
-            <p>解答データが見つかりません。</p>
-            <p className="empty-sub">学習ツールでテストを出力するとここに表示されます。</p>
+            <p>問題データが見つかりません。</p>
           </div>
         ) : (
           <div className="file-grid">
             {displayFiles.map((file) => (
               <Link 
-                to={`/view/${file.id}`}
+                to={`/questions/view/${file.id}`}
                 className={`file-card ${file.isToday ? 'is-today' : ''}`}
                 key={file.id}
               >
                 <div className="card-left">
                   <div className="icon-wrapper">
-                    {getSubjectIcon(file.subject)}
+                    <BookOpen className="subject-icon text-blue-500" />
                   </div>
                   <div className="card-info">
-                    <h3 className="subject-title">{getSubjectName(file.subject)}</h3>
-                    <p className="target-text">対象: {getUserName(file.target)}</p>
+                    <h3 className="subject-title">英語リスニング</h3>
+                    <p className="target-text">対象: {file.target.replace(/_/g, ' ')}</p>
                     <p className="date-text">{file.date}</p>
                   </div>
                 </div>
@@ -162,5 +129,3 @@ function App() {
     </div>
   );
 }
-
-export default App;
