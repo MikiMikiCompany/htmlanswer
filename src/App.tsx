@@ -1,46 +1,16 @@
 import { useState, useEffect } from 'react';
 import { FileText, Calendar, BookOpen, GraduationCap, ChevronRight } from 'lucide-react';
+import { collection, query, orderBy, getDocs } from 'firebase/firestore';
+import { Link } from 'react-router-dom';
+import { db } from './firebase';
 import './index.css';
 
-// Get all html files from the answer directory
-const htmlFiles = import.meta.glob('../answer/*.html', { query: '?url', import: 'default', eager: true }) as Record<string, string>;
-
 interface AnswerFile {
-  path: string;
-  url: string;
-  filename: string;
+  id: string;
   date: string;
   subject: string;
   target: string;
   isToday: boolean;
-}
-
-function parseFilename(path: string, url: string): AnswerFile {
-  // Example path: ../answer/20260531_english_user1.html
-  const filename = path.split('/').pop() || '';
-  const match = filename.match(/^(\d{8})_([^_]+)_(.+)\.html$/);
-  
-  let date = '';
-  let subject = '';
-  let target = '';
-  
-  if (match) {
-    const rawDate = match[1];
-    date = `${rawDate.substring(0, 4)}/${rawDate.substring(4, 6)}/${rawDate.substring(6, 8)}`;
-    subject = match[2];
-    target = match[3];
-  } else {
-    date = 'Unknown Date';
-    subject = 'Unknown';
-    target = filename;
-  }
-  
-  // Format dates for comparison
-  const today = new Date();
-  const todayStr = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
-  const isToday = match ? match[1] === todayStr : false;
-
-  return { path, url, filename, date, subject, target, isToday };
 }
 
 function getSubjectIcon(subject: string) {
@@ -70,12 +40,41 @@ function getSubjectName(subject: string) {
 function App() {
   const [files, setFiles] = useState<AnswerFile[]>([]);
   const [showOnlyToday, setShowOnlyToday] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const parsedFiles = Object.entries(htmlFiles).map(([path, url]) => parseFilename(path, url));
-    // Sort by date descending (newest first)
-    parsedFiles.sort((a, b) => b.filename.localeCompare(a.filename));
-    setFiles(parsedFiles);
+    const fetchAnswers = async () => {
+      try {
+        const q = query(collection(db, 'answers'), orderBy('timestamp', 'desc'));
+        const querySnapshot = await getDocs(q);
+        
+        const today = new Date();
+        const todayStr = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
+        
+        const fetchedFiles: AnswerFile[] = [];
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          const rawDate = data.date || '';
+          const displayDate = rawDate.length === 8 ? `${rawDate.substring(0, 4)}/${rawDate.substring(4, 6)}/${rawDate.substring(6, 8)}` : rawDate;
+          
+          fetchedFiles.push({
+            id: doc.id,
+            date: displayDate,
+            subject: data.subject || '',
+            target: data.target || '',
+            isToday: rawDate === todayStr,
+          });
+        });
+        
+        setFiles(fetchedFiles);
+      } catch (e) {
+        console.error("Error fetching answers:", e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchAnswers();
   }, []);
 
   const displayFiles = showOnlyToday ? files.filter(f => f.isToday) : files;
@@ -113,21 +112,23 @@ function App() {
           </div>
         </div>
 
-        {displayFiles.length === 0 ? (
+        {loading ? (
+          <div className="flex justify-center p-12">
+            <div className="text-gray-500 font-medium">読み込み中...</div>
+          </div>
+        ) : displayFiles.length === 0 ? (
           <div className="empty-state">
             <div className="empty-icon">📝</div>
-            <p>解答ファイルが見つかりません。</p>
+            <p>解答データが見つかりません。</p>
             <p className="empty-sub">学習ツールでテストを出力するとここに表示されます。</p>
           </div>
         ) : (
           <div className="file-grid">
-            {displayFiles.map((file, idx) => (
-              <a 
-                href={file.url} 
-                target="_blank" 
-                rel="noopener noreferrer" 
+            {displayFiles.map((file) => (
+              <Link 
+                to={`/view/${file.id}`}
                 className={`file-card ${file.isToday ? 'is-today' : ''}`}
-                key={idx}
+                key={file.id}
               >
                 <div className="card-left">
                   <div className="icon-wrapper">
@@ -142,7 +143,7 @@ function App() {
                 <div className="card-right">
                   <ChevronRight className="arrow-icon" />
                 </div>
-              </a>
+              </Link>
             ))}
           </div>
         )}
