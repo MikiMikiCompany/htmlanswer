@@ -64,7 +64,7 @@ export default function PasswordLock({ onUnlock }: PasswordLockProps) {
         // Unlock
         const today = new Date();
         const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-        localStorage.setItem('unlocked_date', todayStr);
+        sessionStorage.setItem('unlocked_date', todayStr);
         onUnlock();
       } else {
         // Error

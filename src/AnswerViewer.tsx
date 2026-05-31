@@ -10,25 +10,14 @@ export default function AnswerViewer() {
   const navigate = useNavigate();
   const [htmlContent, setHtmlContent] = useState<string>('');
   const [loading, setLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    // Check if unlocked today (using local time YYYY-MM-DD)
-    const today = new Date();
-    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-    const unlockedDate = localStorage.getItem('unlocked_date');
-    if (unlockedDate === todayStr) {
-      setIsAuthenticated(true);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!isAuthenticated) return;
     const fetchContent = async () => {
       if (!id) return;
       try {
         const docRef = doc(db, 'answers', id);
         const docSnap = await getDoc(docRef);
+        
         if (docSnap.exists()) {
           setHtmlContent(docSnap.data().htmlContent || '');
         } else {
@@ -42,11 +31,7 @@ export default function AnswerViewer() {
       }
     };
     fetchContent();
-  }, [id, isAuthenticated]);
-
-  if (!isAuthenticated) {
-    return <PasswordLock onUnlock={() => setIsAuthenticated(true)} />;
-  }
+  }, [id]);
 
   if (loading) {
     return (

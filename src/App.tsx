@@ -37,6 +37,14 @@ function getSubjectName(subject: string) {
   }
 }
 
+function getUserName(target: string) {
+  let name = target.replace(/_/g, ' ');
+  name = name.replace(/user1/g, 'チャンココ');
+  name = name.replace(/user2/g, 'ゆず');
+  name = name.replace(/user3/g, 'ルチア');
+  return name;
+}
+
 function App() {
   const [files, setFiles] = useState<AnswerFile[]>([]);
   const [showOnlyToday, setShowOnlyToday] = useState(true);
@@ -136,7 +144,7 @@ function App() {
                   </div>
                   <div className="card-info">
                     <h3 className="subject-title">{getSubjectName(file.subject)}</h3>
-                    <p className="target-text">対象: {file.target.replace(/_/g, ' ')}</p>
+                    <p className="target-text">対象: {getUserName(file.target)}</p>
                     <p className="date-text">{file.date}</p>
                   </div>
                 </div>
