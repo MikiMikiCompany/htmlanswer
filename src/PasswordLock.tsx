@@ -32,14 +32,12 @@ export default function PasswordLock({ onUnlock }: PasswordLockProps) {
         if (docSnap.exists()) {
           setTargetPassword(docSnap.data().password);
         } else {
-          // No password generated yet for today, allow bypass or use default
+          // No password generated yet for today, keep it locked
           setTargetPassword([]); 
-          onUnlock(); // Auto unlock if no password was generated
         }
       } catch (e) {
         console.error("Failed to fetch password", e);
         setTargetPassword([]);
-        onUnlock();
       } finally {
         setLoading(false);
       }
@@ -50,6 +48,13 @@ export default function PasswordLock({ onUnlock }: PasswordLockProps) {
   const handleCharClick = (id: number) => {
     if (error) return;
     
+    // If no password set, just show error
+    if (targetPassword.length === 0) {
+      setError(true);
+      setTimeout(() => setError(false), 1000);
+      return;
+    }
+    
     const newInput = [...currentInput, id];
     setCurrentInput(newInput);
 
@@ -57,7 +62,8 @@ export default function PasswordLock({ onUnlock }: PasswordLockProps) {
       // Check password
       if (newInput.join(',') === targetPassword.join(',')) {
         // Unlock
-        const todayStr = new Date().toISOString().split('T')[0];
+        const today = new Date();
+        const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
         localStorage.setItem('unlocked_date', todayStr);
         onUnlock();
       } else {
@@ -88,7 +94,9 @@ export default function PasswordLock({ onUnlock }: PasswordLockProps) {
     <div className="lock-container">
       <div className="lock-box">
         <div className="lock-title">本日のパスワード</div>
-        <div className="lock-subtitle">キャラクターを順番に3つ選んでね</div>
+        <div className="lock-subtitle">
+          {targetPassword.length === 0 ? "問題を作成するとパスワードが設定されます" : "キャラクターを順番に3つ選んでね"}
+        </div>
 
         {/* Input indicators */}
         <div className="input-indicators">

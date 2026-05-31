@@ -13,8 +13,9 @@ export default function AnswerViewer() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    // Check if unlocked today
-    const todayStr = new Date().toISOString().split('T')[0];
+    // Check if unlocked today (using local time YYYY-MM-DD)
+    const today = new Date();
+    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
     const unlockedDate = localStorage.getItem('unlocked_date');
     if (unlockedDate === todayStr) {
       setIsAuthenticated(true);
