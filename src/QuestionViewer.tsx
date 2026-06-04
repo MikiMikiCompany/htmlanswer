@@ -9,6 +9,8 @@ export default function QuestionViewer() {
   const { id } = useParams();
   const [htmlContent, setHtmlContent] = useState<string>('');
   const [audioData, setAudioData] = useState<string | null>(null);
+  const [pdfData, setPdfData] = useState<string | null>(null);
+  const [isPdfUrl, setIsPdfUrl] = useState<boolean>(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -21,6 +23,14 @@ export default function QuestionViewer() {
         if (docSnap.exists()) {
           setHtmlContent(docSnap.data().htmlContent || '');
           setAudioData(docSnap.data().audioData || null);
+          const url = docSnap.data().pdfUrl;
+          if (url) {
+            setPdfData(url);
+            setIsPdfUrl(true);
+          } else {
+            setPdfData(docSnap.data().pdfData || null);
+            setIsPdfUrl(false);
+          }
         } else {
           setHtmlContent('<h2>問題が見つかりません。</h2>');
         }
@@ -52,18 +62,26 @@ export default function QuestionViewer() {
         <div className="viewer-title">問題確認</div>
       </header>
 
-      <main className="viewer-content">
+      <main className="viewer-content" style={{ display: 'flex', flexDirection: 'column', height: pdfData ? '85vh' : 'auto' }}>
         {audioData && (
-          <div className="bg-white p-4 rounded-xl shadow-md mb-6 border border-gray-100 flex flex-col items-center">
-            <h3 className="text-gray-700 font-bold mb-3">リスニング音声</h3>
-            <audio src={audioData} controls className="w-full max-w-md" />
+          <div style={{ background: 'white', padding: '1rem', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', marginBottom: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <h3 style={{ color: '#374151', fontWeight: 'bold', marginBottom: '0.75rem' }}>リスニング音声</h3>
+            <audio src={audioData} controls style={{ width: '100%', maxWidth: '400px' }} />
           </div>
         )}
         
-        <div 
-          className="html-content-wrapper"
-          dangerouslySetInnerHTML={{ __html: htmlContent }} 
-        />
+        {pdfData ? (
+          <iframe 
+            src={isPdfUrl ? pdfData : `data:application/pdf;base64,${pdfData}`} 
+            style={{ width: '100%', flex: 1, border: 'none', borderRadius: '12px', background: 'white', minHeight: '600px' }}
+            title="PDF Document"
+          />
+        ) : (
+          <div 
+            className="html-content-wrapper"
+            dangerouslySetInnerHTML={{ __html: htmlContent }} 
+          />
+        )}
       </main>
     </div>
   );

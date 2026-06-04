@@ -46,7 +46,7 @@ function getUserName(target: string) {
   return name;
 }
 
-function App() {
+function ExplanationList() {
   const [files, setFiles] = useState<AnswerFile[]>([]);
   const [filterDate, setFilterDate] = useState<string>('TODAY');
   const [customDate, setCustomDate] = useState<string>('');
@@ -80,7 +80,7 @@ function App() {
           const rawDate = data.date || '';
           const displayDate = rawDate.length === 8 ? `${rawDate.substring(0, 4)}/${rawDate.substring(4, 6)}/${rawDate.substring(6, 8)}` : rawDate;
           
-          if (data.target !== '文法解説') {
+          if (data.target === '文法解説') {
             fetchedFiles.push({
               id: doc.id,
               date: displayDate,
@@ -132,9 +132,9 @@ function App() {
               ← 戻る
             </Link>
             <div className="logo-icon">✨</div>
-            <h1>解答メニュー</h1>
+            <h1>解説メニュー</h1>
           </div>
-          <p className="subtitle">学習の解答を確認します</p>
+          <p className="subtitle">本日の文法解説を確認します</p>
         </div>
       </header>
 
@@ -183,7 +183,7 @@ function App() {
           <div className="file-grid">
             {displayFiles.map((file) => (
               <Link 
-                to={`/view/${file.id}`}
+                to={`/explanations/view/${file.id}`}
                 className={`file-card ${file.isToday ? 'is-today' : ''}`}
                 key={file.id}
               >
@@ -209,4 +209,4 @@ function App() {
   );
 }
 
-export default App;
+export default ExplanationList;

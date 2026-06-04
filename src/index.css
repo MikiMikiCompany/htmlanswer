@@ -110,6 +110,7 @@ h1 {
   font-weight: 700;
   background: linear-gradient(to right, #3b82f6, #8b5cf6);
   -webkit-background-clip: text;
+  background-clip: text;
   color: transparent;
   letter-spacing: -0.02em;
 }
@@ -215,6 +216,54 @@ h1 {
 .file-card.is-today::before {
   background: linear-gradient(to bottom, #3b82f6, #8b5cf6);
   opacity: 1;
+}
+
+.small-file-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 0.8rem 1rem;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.2s ease;
+}
+
+.small-file-card:hover {
+  background: rgba(255, 255, 255, 0.9);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.small-card-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.small-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.small-subject-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.small-target-text {
+  font-size: 0.8rem;
+  color: var(--text-light);
 }
 
 .card-left {

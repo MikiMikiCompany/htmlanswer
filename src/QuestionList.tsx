@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BookOpen, Calendar, ChevronRight } from 'lucide-react';
+import { BookOpen, Calendar, ChevronRight, FileText } from 'lucide-react';
 import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 import { Link } from 'react-router-dom';
 import { db } from './firebase';
@@ -12,6 +12,8 @@ interface QuestionFile {
   subject: string;
   target: string;
   isToday: boolean;
+  hasAudio: boolean;
+  hasPdf: boolean;
 }
 
 export default function QuestionList() {
@@ -55,6 +57,8 @@ export default function QuestionList() {
             subject: data.subject || '',
             target: data.target || '',
             isToday: rawDate === todayStr,
+            hasAudio: !!data.audioData,
+            hasPdf: !!data.pdfData || !!data.pdfUrl,
           });
         });
         
@@ -69,7 +73,6 @@ export default function QuestionList() {
     fetchQuestions();
   }, []);
 
-  // Use useEffect to set TODAY value initially
   useEffect(() => {
     setFilterDate(past7Days[0].value);
   }, []);
@@ -83,6 +86,9 @@ export default function QuestionList() {
     }
     return f.rawDate === filterDate;
   });
+
+  const listeningFiles = displayFiles.filter(f => f.hasAudio);
+  const otherFiles = displayFiles.filter(f => !f.hasAudio);
 
   return (
     <div className="app-container">
@@ -100,7 +106,7 @@ export default function QuestionList() {
             <div className="logo-icon">🎧</div>
             <h1>問題メニュー</h1>
           </div>
-          <p className="subtitle">リスニング問題などに挑戦しましょう</p>
+          <p className="subtitle">リスニングやプリント問題に挑戦しましょう</p>
         </div>
       </header>
 
@@ -145,28 +151,76 @@ export default function QuestionList() {
             <p>問題データが見つかりません。</p>
           </div>
         ) : (
-          <div className="file-grid">
-            {displayFiles.map((file) => (
-              <Link 
-                to={`/questions/view/${file.id}`}
-                className={`file-card ${file.isToday ? 'is-today' : ''}`}
-                key={file.id}
-              >
-                <div className="card-left">
-                  <div className="icon-wrapper">
-                    <BookOpen className="subject-icon text-blue-500" />
-                  </div>
-                  <div className="card-info">
-                    <h3 className="subject-title">英語リスニング</h3>
-                    <p className="target-text">対象: {file.target.replace(/_/g, ' ')}</p>
-                    <p className="date-text">{file.date}</p>
-                  </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
+            {/* Listening Section */}
+            {listeningFiles.length > 0 && (
+              <div>
+                <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#1f2937', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <BookOpen size={24} color="#3b82f6" /> リスニング
+                </h2>
+                <div className="file-grid">
+                  {listeningFiles.map((file) => (
+                    <Link 
+                      to={`/questions/view/${file.id}`}
+                      className={`file-card ${file.isToday ? 'is-today' : ''}`}
+                      key={file.id}
+                    >
+                      <div className="card-left">
+                        <div className="icon-wrapper">
+                          <BookOpen className="subject-icon text-blue-500" />
+                        </div>
+                        <div className="card-info">
+                          <h3 className="subject-title">英語リスニング</h3>
+                          <p className="target-text">対象: {file.target.replace(/_/g, ' ')}</p>
+                          <p className="date-text">{file.date}</p>
+                        </div>
+                      </div>
+                      <div className="card-right">
+                        <ChevronRight className="arrow-icon" />
+                      </div>
+                    </Link>
+                  ))}
                 </div>
-                <div className="card-right">
-                  <ChevronRight className="arrow-icon" />
+              </div>
+            )}
+
+            {/* Other Subjects Section */}
+            {otherFiles.length > 0 && (
+              <div>
+                <h2 style={{ fontSize: '1.2rem', fontWeight: 600, marginBottom: '1rem', color: '#4b5563', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <FileText size={20} /> その他の問題（漢字・英語・算数など）
+                </h2>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '1rem' }}>
+                  {otherFiles.map((file) => {
+                    let subjectName = file.subject;
+                    if (subjectName === 'kanji') subjectName = '漢字';
+                    if (subjectName === 'vocab') subjectName = '英単語';
+                    if (subjectName === 'english_study') subjectName = '英語構文';
+                    if (subjectName === 'english') subjectName = '英語';
+                    if (subjectName === 'math') subjectName = '算数';
+                    
+                    return (
+                      <Link 
+                        to={`/questions/view/${file.id}`}
+                        className="small-file-card"
+                        key={file.id}
+                      >
+                        <div className="small-card-left">
+                          <div className="small-icon-wrapper">
+                            <FileText size={18} color="#6b7280" />
+                          </div>
+                          <div>
+                            <h3 className="small-subject-title">{subjectName}</h3>
+                            <p className="small-target-text">{file.target.replace(/_/g, ' ')}</p>
+                          </div>
+                        </div>
+                        <ChevronRight size={18} color="#9ca3af" />
+                      </Link>
+                    );
+                  })}
                 </div>
-              </Link>
-            ))}
+              </div>
+            )}
           </div>
         )}
       </main>
