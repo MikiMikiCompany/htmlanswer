@@ -21,14 +21,29 @@ export default function QuestionViewer() {
         const docSnap = await getDoc(docRef);
         
         if (docSnap.exists()) {
-          setHtmlContent(docSnap.data().htmlContent || '');
-          setAudioData(docSnap.data().audioData || null);
-          const url = docSnap.data().pdfUrl;
+          const data = docSnap.data();
+          
+          if (data.htmlUrl) {
+            try {
+              const response = await fetch(data.htmlUrl);
+              const text = await response.text();
+              setHtmlContent(text);
+            } catch (err) {
+              console.error(err);
+              setHtmlContent('<h2>読み込みに失敗しました。</h2>');
+            }
+          } else {
+            setHtmlContent(data.htmlContent || '');
+          }
+          
+          setAudioData(data.audioUrl || data.audioData || null);
+          
+          const url = data.pdfUrl;
           if (url) {
             setPdfData(url);
             setIsPdfUrl(true);
           } else {
-            setPdfData(docSnap.data().pdfData || null);
+            setPdfData(data.pdfData || null);
             setIsPdfUrl(false);
           }
         } else {

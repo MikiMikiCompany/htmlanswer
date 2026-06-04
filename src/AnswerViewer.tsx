@@ -18,7 +18,19 @@ export default function AnswerViewer() {
         const docSnap = await getDoc(docRef);
         
         if (docSnap.exists()) {
-          setHtmlContent(docSnap.data().htmlContent || '');
+          const data = docSnap.data();
+          if (data.htmlUrl) {
+            try {
+              const response = await fetch(data.htmlUrl);
+              const text = await response.text();
+              setHtmlContent(text);
+            } catch (fetchErr) {
+              console.error(fetchErr);
+              setHtmlContent('<h2>読み込みに失敗しました。</h2>');
+            }
+          } else {
+            setHtmlContent(data.htmlContent || '');
+          }
         } else {
           setHtmlContent('<h2>解答が見つかりません。</h2>');
         }

@@ -80,7 +80,7 @@ function App() {
           const rawDate = data.date || '';
           const displayDate = rawDate.length === 8 ? `${rawDate.substring(0, 4)}/${rawDate.substring(4, 6)}/${rawDate.substring(6, 8)}` : rawDate;
           
-          if (data.target !== '文法解説') {
+          if (data.target !== '文法解説' && data.subject !== 'evaluation') {
             fetchedFiles.push({
               id: doc.id,
               date: displayDate,

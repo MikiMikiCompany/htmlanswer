@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FileText, Calendar, BookOpen, GraduationCap, ChevronRight } from 'lucide-react';
+import { FileText, Calendar, BookOpen, GraduationCap, ChevronRight, Star } from 'lucide-react';
 import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 import { Link } from 'react-router-dom';
 import { db } from './firebase';
@@ -80,7 +80,7 @@ function ExplanationList() {
           const rawDate = data.date || '';
           const displayDate = rawDate.length === 8 ? `${rawDate.substring(0, 4)}/${rawDate.substring(4, 6)}/${rawDate.substring(6, 8)}` : rawDate;
           
-          if (data.target === '文法解説') {
+          if (data.target === '文法解説' || data.subject === 'evaluation') {
             fetchedFiles.push({
               id: doc.id,
               date: displayDate,
@@ -132,9 +132,9 @@ function ExplanationList() {
               ← 戻る
             </Link>
             <div className="logo-icon">✨</div>
-            <h1>解説メニュー</h1>
+            <h1>解説・評価メニュー</h1>
           </div>
-          <p className="subtitle">本日の文法解説を確認します</p>
+          <p className="subtitle">本日の文法解説や漢字の総評を確認します</p>
         </div>
       </header>
 
@@ -176,8 +176,8 @@ function ExplanationList() {
         ) : displayFiles.length === 0 ? (
           <div className="empty-state">
             <div className="empty-icon">📝</div>
-            <p>解答データが見つかりません。</p>
-            <p className="empty-sub">学習ツールでテストを出力するとここに表示されます。</p>
+            <p>データが見つかりません。</p>
+            <p className="empty-sub">解説や総評が作成されるとここに表示されます。</p>
           </div>
         ) : (
           <div className="file-grid">
@@ -189,10 +189,16 @@ function ExplanationList() {
               >
                 <div className="card-left">
                   <div className="icon-wrapper">
-                    {getSubjectIcon(file.subject)}
+                    {file.subject === 'evaluation' ? (
+                      <Star className="subject-icon text-yellow-500" />
+                    ) : (
+                      getSubjectIcon(file.subject)
+                    )}
                   </div>
                   <div className="card-info">
-                    <h3 className="subject-title">{getSubjectName(file.subject)}</h3>
+                    <h3 className="subject-title">
+                      {file.subject === 'evaluation' ? '総評レポート' : getSubjectName(file.subject)}
+                    </h3>
                     <p className="target-text">対象: {getUserName(file.target)}</p>
                     <p className="date-text">{file.date}</p>
                   </div>
