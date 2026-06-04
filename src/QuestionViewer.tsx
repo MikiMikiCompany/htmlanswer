@@ -92,10 +92,14 @@ export default function QuestionViewer() {
             title="PDF Document"
           />
         ) : (
-          <div 
-            className="html-content-wrapper"
-            dangerouslySetInnerHTML={{ __html: htmlContent }} 
-          />
+          <div style={{ flex: 1, width: '100%', backgroundColor: '#fff', position: 'relative', borderRadius: '12px', overflow: 'hidden', minHeight: '600px' }}>
+            <iframe
+              title="Question Content"
+              srcDoc={htmlContent}
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 'none' }}
+              sandbox="allow-same-origin allow-scripts"
+            />
+          </div>
         )}
       </main>
     </div>
