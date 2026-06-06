@@ -6,10 +6,19 @@ import './index.css';
 export default function Home() {
   const [hasPendingSyakai, setHasPendingSyakai] = useState(false);
 
+  const playSyakaiAudio = () => {
+    try {
+      const audio = new Audio('/syakai.wav');
+      audio.play();
+    } catch (e) {
+      console.error('Audio play failed', e);
+    }
+  };
+
   useEffect(() => {
     const checkSyakaiProgress = async () => {
       try {
-        const response = await fetch(`https://raw.githubusercontent.com/MikiMikiCompany/syakai/main/data/progress.json?t=${Date.now()}`);
+        const response = await fetch(`https://syakai.vercel.app/api/progress?t=${Date.now()}`);
         if (response.ok) {
           const data = await response.json();
           const pending = Object.values(data).some((item: any) => item.status === 'created');
@@ -40,7 +49,10 @@ export default function Home() {
 
       <main className="home-menu-container">
         {hasPendingSyakai && (
-          <div style={{ width: '100%', marginBottom: '1rem', display: 'block' }}>
+          <div 
+            onClick={playSyakaiAudio}
+            style={{ width: '100%', marginBottom: '1rem', display: 'block', cursor: 'pointer' }}
+          >
             <div style={{ 
               background: 'linear-gradient(135deg, #a7f3d0, #34d399)', 
               borderRadius: '16px', 
@@ -50,7 +62,8 @@ export default function Home() {
               display: 'flex',
               alignItems: 'center',
               gap: '1rem',
-              border: '2px solid #059669'
+              border: '2px solid #059669',
+              transition: 'transform 0.2s'
             }}>
               <div style={{ fontSize: '2.5rem', lineHeight: 1 }}>🌱</div>
               <div>
