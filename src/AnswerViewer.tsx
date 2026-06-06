@@ -22,14 +22,31 @@ export default function AnswerViewer() {
           if (data.htmlUrl) {
             try {
               const response = await fetch(data.htmlUrl);
-              const text = await response.text();
+              let text = await response.text();
+              
+              // iOS Safari対策: iframe内で縦書き(vertical-rl)の高さが0に潰れるのを防ぐ
+              if (text.includes('vertical-rl') && !text.includes('html_answer_ios_fix')) {
+                text = text.replace('</style>', ' html, body { height: 100%; min-height: 100vh; overflow-x: auto; margin: 0; } /* html_answer_ios_fix */ </style>');
+                if (!text.includes('viewport')) {
+                  text = text.replace('<head>', '<head><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">');
+                }
+              }
+              
               setHtmlContent(text);
             } catch (fetchErr) {
               console.error(fetchErr);
               setHtmlContent('<h2>読み込みに失敗しました。</h2>');
             }
           } else {
-            setHtmlContent(data.htmlContent || '');
+            let text = data.htmlContent || '';
+            // iOS Safari対策（htmlContentのパターン）
+            if (text.includes('vertical-rl') && !text.includes('html_answer_ios_fix')) {
+              text = text.replace('</style>', ' html, body { height: 100%; min-height: 100vh; overflow-x: auto; margin: 0; } /* html_answer_ios_fix */ </style>');
+              if (!text.includes('viewport')) {
+                text = text.replace('<head>', '<head><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">');
+              }
+            }
+            setHtmlContent(text);
           }
         } else {
           setHtmlContent('<h2>解答が見つかりません。</h2>');
