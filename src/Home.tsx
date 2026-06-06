@@ -43,7 +43,7 @@ export default function Home() {
         let pending = false;
         querySnapshot.forEach((doc) => {
           const data = doc.data();
-          if (data.isRead === false && data.target && data.target.includes('へー')) {
+          if (data.isRead === false && data.user === 'へー') {
             pending = true;
           }
         });
