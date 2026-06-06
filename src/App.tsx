@@ -28,9 +28,10 @@ function getSubjectIcon(subject: string) {
   }
 }
 
-function getSubjectName(subject: string) {
+function getSubjectName(subject: string, target: string = '') {
   switch (subject.toLowerCase()) {
-    case 'english': return '英語';
+    case 'english': 
+      return target.includes('リスニング') ? '英語リスニング' : '英語';
     case 'vocab': return '英単語';
     case 'math': return '算数';
     case 'kanji': return '漢字';
@@ -229,7 +230,7 @@ function App() {
                       {getSubjectIcon(file.subject)}
                     </div>
                     <div className="card-info">
-                      <h3 className="subject-title">{getSubjectName(file.subject)}</h3>
+                      <h3 className="subject-title">{getSubjectName(file.subject, file.target)}</h3>
                       <p className="target-text">対象: {targetName}</p>
                       <p className="date-text">{file.date}</p>
                     </div>
