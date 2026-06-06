@@ -39,21 +39,20 @@ function getSubjectName(subject: string) {
   }
 }
 
-function getActualTarget(subject: string, rawTarget: string) {
-  const s = subject.toLowerCase();
-  if (s === 'kanji' || s === 'math' || s === 'science') {
-    return 'チャンココ';
-  }
-  
+function getDisplayTarget(subject: string, rawTarget: string) {
   const targetStr = rawTarget.toLowerCase();
-  if (targetStr.includes('5') && (targetStr.includes('級') || targetStr.includes('eiken') || targetStr.includes('kyu'))) {
-    return 'チャンココ';
-  }
-  if (targetStr.includes('3') && (targetStr.includes('級') || targetStr.includes('eiken') || targetStr.includes('kyu'))) {
-    return 'へー';
-  }
-  if (targetStr.includes('all') || targetStr.includes('全員')) {
-    return 'ALL';
+  const s = subject.toLowerCase();
+  
+  if (s === 'english' || s === 'vocab' || s === 'english_study') {
+    if (targetStr.includes('5') && (targetStr.includes('級') || targetStr.includes('eiken') || targetStr.includes('kyu'))) {
+      return 'チャンココ';
+    }
+    if (targetStr.includes('3') && (targetStr.includes('級') || targetStr.includes('eiken') || targetStr.includes('kyu'))) {
+      return 'へー';
+    }
+    if (targetStr.includes('all') || targetStr.includes('全員')) {
+      return 'ALL';
+    }
   }
 
   let name = rawTarget.replace(/_/g, ' ');
@@ -63,11 +62,16 @@ function getActualTarget(subject: string, rawTarget: string) {
   return name;
 }
 
-function getTargetColor(targetName: string) {
-  if (targetName.includes('チャンココ')) return '#3b82f6'; // blue
-  if (targetName.includes('へー')) return '#10b981'; // green
-  if (targetName.includes('みき')) return '#f43f5e'; // pink
-  if (targetName.includes('ALL')) return '#8b5cf6'; // purple
+function getTargetColor(subject: string, displayTarget: string) {
+  const s = subject.toLowerCase();
+  if (s === 'kanji' || s === 'math' || s === 'science') {
+    return '#3b82f6'; // blue
+  }
+  
+  if (displayTarget.includes('チャンココ')) return '#3b82f6'; // blue
+  if (displayTarget.includes('へー')) return '#10b981'; // green
+  if (displayTarget.includes('みき')) return '#f43f5e'; // pink
+  if (displayTarget.includes('ALL')) return '#8b5cf6'; // purple
   return '#94a3b8'; // gray
 }
 
@@ -210,8 +214,8 @@ function App() {
         ) : (
           <div className="file-grid">
             {displayFiles.map((file) => {
-              const targetName = getActualTarget(file.subject, file.target);
-              const targetColor = getTargetColor(targetName);
+              const targetName = getDisplayTarget(file.subject, file.target);
+              const targetColor = getTargetColor(file.subject, targetName);
               
               return (
                 <Link 
