@@ -115,7 +115,7 @@ function ExplanationList() {
           const rawDate = data.date || '';
           const displayDate = rawDate.length === 8 ? `${rawDate.substring(0, 4)}/${rawDate.substring(4, 6)}/${rawDate.substring(6, 8)}` : rawDate;
           
-          if (data.target === '文法解説' || data.subject === 'evaluation' || data.subject === 'math_explain' || data.subject === 'science_explain') {
+          if (data.target === '文法解説' || data.subject === 'evaluation' || data.subject === 'math_explain' || data.subject === 'science_explain' || data.subject === 'english_explain') {
             fetchedFiles.push({
               id: doc.id,
               date: displayDate,
@@ -237,6 +237,7 @@ function ExplanationList() {
                         {file.subject === 'evaluation' ? '総評レポート' : 
                          file.subject === 'math_explain' ? '算数エンタメ授業' :
                          file.subject === 'science_explain' ? '理科エンタメ授業' :
+                         file.subject === 'english_explain' ? '英語エンタメ授業' :
                          getSubjectName(file.subject)}
                       </h3>
                       <p className="target-text">対象: {targetName}</p>
