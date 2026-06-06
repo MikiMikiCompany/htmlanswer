@@ -18,7 +18,13 @@ interface QuestionFile {
 
 export default function QuestionList() {
   const [files, setFiles] = useState<QuestionFile[]>([]);
-  const [filterDate, setFilterDate] = useState<string>('TODAY');
+  const [filterDate, setFilterDate] = useState<string>(() => {
+    const d = new Date();
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}${mm}${dd}`;
+  });
   const [customDate, setCustomDate] = useState<string>('');
   const [loading, setLoading] = useState(true);
 
@@ -73,9 +79,7 @@ export default function QuestionList() {
     fetchQuestions();
   }, []);
 
-  useEffect(() => {
-    setFilterDate(past7Days[0].value);
-  }, []);
+
 
   const displayFiles = files.filter(f => {
     if (filterDate === 'ALL') return true;
