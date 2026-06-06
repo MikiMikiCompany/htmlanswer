@@ -63,7 +63,7 @@ export default function QuestionList() {
             subject: data.subject || '',
             target: data.target || '',
             isToday: rawDate === todayStr,
-            hasAudio: !!data.audioData,
+            hasAudio: !!data.audioData || !!data.audioUrl,
             hasPdf: !!data.pdfData || !!data.pdfUrl,
           });
         });
