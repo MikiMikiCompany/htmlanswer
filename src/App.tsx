@@ -34,16 +34,41 @@ function getSubjectName(subject: string) {
     case 'vocab': return '英単語';
     case 'math': return '算数';
     case 'kanji': return '漢字';
+    case 'science': return '理科';
     default: return subject;
   }
 }
 
-function getUserName(target: string) {
-  let name = target.replace(/_/g, ' ');
+function getActualTarget(subject: string, rawTarget: string) {
+  const s = subject.toLowerCase();
+  if (s === 'kanji' || s === 'math' || s === 'science') {
+    return 'チャンココ';
+  }
+  
+  const targetStr = rawTarget.toLowerCase();
+  if (targetStr.includes('5') && (targetStr.includes('級') || targetStr.includes('eiken') || targetStr.includes('kyu'))) {
+    return 'チャンココ';
+  }
+  if (targetStr.includes('3') && (targetStr.includes('級') || targetStr.includes('eiken') || targetStr.includes('kyu'))) {
+    return 'へー';
+  }
+  if (targetStr.includes('all') || targetStr.includes('全員')) {
+    return 'ALL';
+  }
+
+  let name = rawTarget.replace(/_/g, ' ');
   name = name.replace(/user1/g, 'チャンココ');
   name = name.replace(/user2/g, 'へー');
   name = name.replace(/user3/g, 'みき');
   return name;
+}
+
+function getTargetColor(targetName: string) {
+  if (targetName.includes('チャンココ')) return '#3b82f6'; // blue
+  if (targetName.includes('へー')) return '#10b981'; // green
+  if (targetName.includes('みき')) return '#f43f5e'; // pink
+  if (targetName.includes('ALL')) return '#8b5cf6'; // purple
+  return '#94a3b8'; // gray
 }
 
 function App() {
@@ -184,27 +209,33 @@ function App() {
           </div>
         ) : (
           <div className="file-grid">
-            {displayFiles.map((file) => (
-              <Link 
-                to={`/view/${file.id}`}
-                className={`file-card ${file.isToday ? 'is-today' : ''}`}
-                key={file.id}
-              >
-                <div className="card-left">
-                  <div className="icon-wrapper">
-                    {getSubjectIcon(file.subject)}
+            {displayFiles.map((file) => {
+              const targetName = getActualTarget(file.subject, file.target);
+              const targetColor = getTargetColor(targetName);
+              
+              return (
+                <Link 
+                  to={`/view/${file.id}`}
+                  className={`file-card ${file.isToday ? 'is-today' : ''}`}
+                  key={file.id}
+                  style={{ borderLeft: `6px solid ${targetColor}` }}
+                >
+                  <div className="card-left">
+                    <div className="icon-wrapper">
+                      {getSubjectIcon(file.subject)}
+                    </div>
+                    <div className="card-info">
+                      <h3 className="subject-title">{getSubjectName(file.subject)}</h3>
+                      <p className="target-text">対象: {targetName}</p>
+                      <p className="date-text">{file.date}</p>
+                    </div>
                   </div>
-                  <div className="card-info">
-                    <h3 className="subject-title">{getSubjectName(file.subject)}</h3>
-                    <p className="target-text">対象: {getUserName(file.target)}</p>
-                    <p className="date-text">{file.date}</p>
+                  <div className="card-right">
+                    <ChevronRight className="arrow-icon" />
                   </div>
-                </div>
-                <div className="card-right">
-                  <ChevronRight className="arrow-icon" />
-                </div>
-              </Link>
-            ))}
+                </Link>
+              );
+            })}
           </div>
         )}
       </main>
