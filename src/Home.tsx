@@ -1,8 +1,26 @@
 import { Link } from 'react-router-dom';
 import { Headphones, KeyRound, BookOpenCheck } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import './index.css';
 
 export default function Home() {
+  const [hasPendingSyakai, setHasPendingSyakai] = useState(false);
+
+  useEffect(() => {
+    const checkSyakaiProgress = async () => {
+      try {
+        const response = await fetch(`https://raw.githubusercontent.com/MikiMikiCompany/syakai/main/data/progress.json?t=${Date.now()}`);
+        if (response.ok) {
+          const data = await response.json();
+          const pending = Object.values(data).some((item: any) => item.status === 'created');
+          setHasPendingSyakai(pending);
+        }
+      } catch (error) {
+        console.error("Failed to fetch syakai progress:", error);
+      }
+    };
+    checkSyakaiProgress();
+  }, []);
   return (
     <div className="app-container">
       <div className="background-shapes">
@@ -21,6 +39,28 @@ export default function Home() {
       </header>
 
       <main className="home-menu-container">
+        {hasPendingSyakai && (
+          <div style={{ width: '100%', marginBottom: '1rem', display: 'block' }}>
+            <div style={{ 
+              background: 'linear-gradient(135deg, #a7f3d0, #34d399)', 
+              borderRadius: '16px', 
+              padding: '1.2rem', 
+              color: '#064e3b',
+              boxShadow: '0 4px 15px rgba(52, 211, 153, 0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '1rem',
+              border: '2px solid #059669'
+            }}>
+              <div style={{ fontSize: '2.5rem', lineHeight: 1 }}>🌱</div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 'bold' }}>チャンココ！社会が出題されているのだ！</h3>
+                <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.95rem', opacity: 0.9 }}>社会アプリを開いて終わらせるのだ！</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         <Link to="/questions" style={{ textDecoration: 'none', width: '100%' }}>
           <div className="home-card blue">
             <div className="home-icon-box">
