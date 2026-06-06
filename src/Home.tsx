@@ -1,10 +1,13 @@
 import { Link } from 'react-router-dom';
 import { Headphones, KeyRound, BookOpenCheck } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from './firebase';
 import './index.css';
 
 export default function Home() {
   const [hasPendingSyakai, setHasPendingSyakai] = useState(false);
+  const [hasPendingEnglish, setHasPendingEnglish] = useState(false);
 
   const playSyakaiAudio = () => {
     try {
@@ -28,7 +31,31 @@ export default function Home() {
         console.error("Failed to fetch syakai progress:", error);
       }
     };
+
+    const checkEnglishProgress = async () => {
+      try {
+        const q = query(
+          collection(db, 'answers'),
+          where('subject', '==', 'english_explain'),
+          where('isRead', '==', false)
+        );
+        const querySnapshot = await getDocs(q);
+        
+        let pending = false;
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          if (data.target && data.target.includes('へー')) {
+            pending = true;
+          }
+        });
+        setHasPendingEnglish(pending);
+      } catch (error) {
+        console.error("Failed to fetch english progress:", error);
+      }
+    };
+
     checkSyakaiProgress();
+    checkEnglishProgress();
   }, []);
   return (
     <div className="app-container">
@@ -72,6 +99,32 @@ export default function Home() {
               </div>
             </div>
           </div>
+        )}
+
+        {hasPendingEnglish && (
+          <Link 
+            to="/explanations"
+            style={{ width: '100%', marginBottom: '1rem', display: 'block', textDecoration: 'none' }}
+          >
+            <div style={{ 
+              background: 'linear-gradient(135deg, #bfdbfe, #60a5fa)', 
+              borderRadius: '16px', 
+              padding: '1.2rem', 
+              color: '#1e3a8a',
+              boxShadow: '0 4px 15px rgba(96, 165, 250, 0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '1rem',
+              border: '2px solid #3b82f6',
+              transition: 'transform 0.2s'
+            }}>
+              <div style={{ fontSize: '2.5rem', lineHeight: 1 }}>📖</div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 'bold' }}>へー、英語が出題されているから読んでおけ。</h3>
+                <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.95rem', opacity: 0.9 }}>解説メニューからエンタメ授業を確認するのだ</p>
+              </div>
+            </div>
+          </Link>
         )}
 
         <Link to="/questions" style={{ textDecoration: 'none', width: '100%' }}>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from './firebase';
 import { ArrowLeft } from 'lucide-react';
 
@@ -19,6 +19,15 @@ export default function AnswerViewer() {
         
         if (docSnap.exists()) {
           const data = docSnap.data();
+          
+          if (data.subject === 'english_explain' && data.isRead === false) {
+            try {
+              await updateDoc(docRef, { isRead: true });
+            } catch (err) {
+              console.error('Failed to update isRead status:', err);
+            }
+          }
+
           if (data.htmlUrl) {
             try {
               const response = await fetch(data.htmlUrl);
