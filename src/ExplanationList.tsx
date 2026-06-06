@@ -80,7 +80,7 @@ function ExplanationList() {
           const rawDate = data.date || '';
           const displayDate = rawDate.length === 8 ? `${rawDate.substring(0, 4)}/${rawDate.substring(4, 6)}/${rawDate.substring(6, 8)}` : rawDate;
           
-          if (data.target === '文法解説' || data.subject === 'evaluation') {
+          if (data.target === '文法解説' || data.subject === 'evaluation' || data.subject === 'math_explain' || data.subject === 'science_explain') {
             fetchedFiles.push({
               id: doc.id,
               date: displayDate,
@@ -134,7 +134,7 @@ function ExplanationList() {
             <div className="logo-icon">✨</div>
             <h1>解説・評価メニュー</h1>
           </div>
-          <p className="subtitle">本日の文法解説や漢字の総評を確認します</p>
+          <p className="subtitle">本日の文法解説や総評、エンタメ授業を確認します</p>
         </div>
       </header>
 
@@ -197,7 +197,10 @@ function ExplanationList() {
                   </div>
                   <div className="card-info">
                     <h3 className="subject-title">
-                      {file.subject === 'evaluation' ? '総評レポート' : getSubjectName(file.subject)}
+                      {file.subject === 'evaluation' ? '総評レポート' : 
+                       file.subject === 'math_explain' ? '算数エンタメ授業' :
+                       file.subject === 'science_explain' ? '理科エンタメ授業' :
+                       getSubjectName(file.subject)}
                     </h3>
                     <p className="target-text">対象: {getUserName(file.target)}</p>
                     <p className="date-text">{file.date}</p>

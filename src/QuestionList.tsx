@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BookOpen, Calendar, ChevronRight, FileText } from 'lucide-react';
+import { BookOpen, Calendar, ChevronRight, FileText, Headphones } from 'lucide-react';
 import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 import { Link } from 'react-router-dom';
 import { db } from './firebase';
@@ -158,25 +158,24 @@ export default function QuestionList() {
                 <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#1f2937', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   <BookOpen size={24} color="#3b82f6" /> リスニング
                 </h2>
-                <div className="file-grid">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                   {listeningFiles.map((file) => (
                     <Link 
                       to={`/questions/view/${file.id}`}
-                      className={`file-card ${file.isToday ? 'is-today' : ''}`}
+                      className="home-card blue"
                       key={file.id}
+                      style={{ padding: '1.5rem', borderRadius: '1.5rem', border: file.isToday ? '2px solid #60a5fa' : '4px solid transparent' }}
                     >
-                      <div className="card-left">
-                        <div className="icon-wrapper">
-                          <BookOpen className="subject-icon text-blue-500" />
-                        </div>
-                        <div className="card-info">
-                          <h3 className="subject-title">英語リスニング</h3>
-                          <p className="target-text">対象: {file.target.replace(/_/g, ' ')}</p>
-                          <p className="date-text">{file.date}</p>
-                        </div>
+                      <div className="home-icon-box" style={{ width: '80px', height: '80px' }}>
+                        <Headphones size={40} />
                       </div>
-                      <div className="card-right">
-                        <ChevronRight className="arrow-icon" />
+                      <div className="home-card-content">
+                        <h2 style={{ fontSize: '1.5rem', marginBottom: '0.25rem' }}>英語リスニング</h2>
+                        <p style={{ fontSize: '1rem' }}>対象: {file.target.replace(/_/g, ' ')}</p>
+                        <p style={{ fontSize: '0.85rem', color: '#9ca3af', marginTop: '0.25rem' }}>{file.date}</p>
+                      </div>
+                      <div className="home-card-arrow">
+                        <ChevronRight size={32} />
                       </div>
                     </Link>
                   ))}
