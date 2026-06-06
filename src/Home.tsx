@@ -36,15 +36,14 @@ export default function Home() {
       try {
         const q = query(
           collection(db, 'answers'),
-          where('subject', '==', 'english_explain'),
-          where('isRead', '==', false)
+          where('subject', '==', 'english_explain')
         );
         const querySnapshot = await getDocs(q);
         
         let pending = false;
         querySnapshot.forEach((doc) => {
           const data = doc.data();
-          if (data.target && data.target.includes('へー')) {
+          if (data.isRead === false && data.target && data.target.includes('へー')) {
             pending = true;
           }
         });
