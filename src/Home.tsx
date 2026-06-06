@@ -8,6 +8,7 @@ import './index.css';
 export default function Home() {
   const [hasPendingSyakai, setHasPendingSyakai] = useState(false);
   const [hasPendingEnglish, setHasPendingEnglish] = useState(false);
+  const [hasPendingMathJhs, setHasPendingMathJhs] = useState(false);
 
   const playSyakaiAudio = () => {
     try {
@@ -53,8 +54,30 @@ export default function Home() {
       }
     };
 
+    const checkMathJhsProgress = async () => {
+      try {
+        const q = query(
+          collection(db, 'answers'),
+          where('subject', '==', 'math_jhs_explain')
+        );
+        const querySnapshot = await getDocs(q);
+        
+        let pending = false;
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          if (data.isRead === false && data.user === 'へー') {
+            pending = true;
+          }
+        });
+        setHasPendingMathJhs(pending);
+      } catch (error) {
+        console.error("Failed to fetch math_jhs progress:", error);
+      }
+    };
+
     checkSyakaiProgress();
     checkEnglishProgress();
+    checkMathJhsProgress();
   }, []);
   return (
     <div className="app-container">
@@ -120,6 +143,32 @@ export default function Home() {
               <div style={{ fontSize: '2.5rem', lineHeight: 1 }}>📖</div>
               <div>
                 <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 'bold' }}>へー、英語が出題されているから読んでおけ。</h3>
+                <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.95rem', opacity: 0.9 }}>解説メニューからエンタメ授業を確認するのだ</p>
+              </div>
+            </div>
+          </Link>
+        )}
+
+        {hasPendingMathJhs && (
+          <Link 
+            to="/explanations"
+            style={{ width: '100%', marginBottom: '1rem', display: 'block', textDecoration: 'none' }}
+          >
+            <div style={{ 
+              background: 'linear-gradient(135deg, #e9d5ff, #c084fc)', 
+              borderRadius: '16px', 
+              padding: '1.2rem', 
+              color: '#581c87',
+              boxShadow: '0 4px 15px rgba(192, 132, 252, 0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '1rem',
+              border: '2px solid #9333ea',
+              transition: 'transform 0.2s'
+            }}>
+              <div style={{ fontSize: '2.5rem', lineHeight: 1 }}>📐</div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 'bold' }}>へー、中学数学が出題されているから読んでおけ。</h3>
                 <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.95rem', opacity: 0.9 }}>解説メニューからエンタメ授業を確認するのだ</p>
               </div>
             </div>

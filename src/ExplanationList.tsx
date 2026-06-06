@@ -20,6 +20,7 @@ function getSubjectIcon(subject: string) {
     case 'vocab':
       return <BookOpen className="subject-icon text-blue-500" />;
     case 'math':
+    case 'math_jhs_explain':
       return <GraduationCap className="subject-icon text-purple-500" />;
     case 'kanji':
       return <FileText className="subject-icon text-red-500" />;
@@ -33,6 +34,7 @@ function getSubjectName(subject: string) {
     case 'english': return '英語';
     case 'vocab': return '英単語';
     case 'math': return '算数';
+    case 'math_jhs_explain': return '中学数学';
     case 'kanji': return '漢字';
     case 'science': return '理科';
     default: return subject;
@@ -115,7 +117,7 @@ function ExplanationList() {
           const rawDate = data.date || '';
           const displayDate = rawDate.length === 8 ? `${rawDate.substring(0, 4)}/${rawDate.substring(4, 6)}/${rawDate.substring(6, 8)}` : rawDate;
           
-          if (data.target === '文法解説' || data.subject === 'evaluation' || data.subject === 'math_explain' || data.subject === 'science_explain' || data.subject === 'english_explain') {
+          if (data.target === '文法解説' || data.subject === 'evaluation' || data.subject === 'math_explain' || data.subject === 'science_explain' || data.subject === 'english_explain' || data.subject === 'math_jhs_explain') {
             fetchedFiles.push({
               id: doc.id,
               date: displayDate,

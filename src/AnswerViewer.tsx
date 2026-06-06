@@ -20,7 +20,7 @@ export default function AnswerViewer() {
         if (docSnap.exists()) {
           const data = docSnap.data();
           
-          if (data.subject === 'english_explain' && data.isRead === false) {
+          if ((data.subject === 'english_explain' || data.subject === 'math_jhs_explain') && data.isRead === false) {
             try {
               await updateDoc(docRef, { isRead: true });
             } catch (err) {
