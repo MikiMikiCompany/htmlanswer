@@ -11,6 +11,7 @@ interface AnswerFile {
   rawDate?: string;
   subject: string;
   target: string;
+  user?: string;
   isToday: boolean;
 }
 
@@ -20,6 +21,7 @@ function getSubjectIcon(subject: string) {
     case 'vocab':
       return <BookOpen className="subject-icon text-blue-500" />;
     case 'math':
+    case 'math_jhs':
       return <GraduationCap className="subject-icon text-purple-500" />;
     case 'kanji':
       return <FileText className="subject-icon text-red-500" />;
@@ -34,6 +36,7 @@ function getSubjectName(subject: string, target: string = '') {
       return target.includes('リスニング') ? '英語リスニング' : '英語';
     case 'vocab': return '英単語';
     case 'math': return '算数';
+    case 'math_jhs': return '中学数学';
     case 'kanji': return '漢字';
     case 'science': return '理科';
     default: return subject;
@@ -63,7 +66,11 @@ function getDisplayTarget(subject: string, rawTarget: string) {
   return name;
 }
 
-function getTargetColor(subject: string, displayTarget: string) {
+function getTargetColor(subject: string, displayTarget: string, user?: string) {
+  if (user === 'user2' || user === 'へー') return '#10b981'; // green
+  if (user === 'user1' || user === 'チャンココ') return '#3b82f6'; // blue
+  if (user === 'user3' || user === 'みき') return '#f43f5e'; // pink
+
   const s = subject.toLowerCase();
   if (s === 'kanji' || s === 'math' || s === 'science') {
     return '#3b82f6'; // blue
@@ -116,13 +123,14 @@ function App() {
           const rawDate = data.date || '';
           const displayDate = rawDate.length === 8 ? `${rawDate.substring(0, 4)}/${rawDate.substring(4, 6)}/${rawDate.substring(6, 8)}` : rawDate;
           
-          if (data.target !== '文法解説' && data.subject !== 'evaluation' && data.subject !== 'math_explain' && data.subject !== 'science_explain') {
+          if (data.target !== '文法解説' && data.subject !== 'evaluation' && data.subject !== 'math_explain' && data.subject !== 'science_explain' && data.subject !== 'english_explain' && data.subject !== 'math_jhs_explain') {
             fetchedFiles.push({
               id: doc.id,
               date: displayDate,
               rawDate: rawDate,
               subject: data.subject || '',
               target: data.target || '',
+              user: data.user || '',
               isToday: rawDate === todayStr,
             });
           }
@@ -137,6 +145,7 @@ function App() {
     };
     
     fetchAnswers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
 
@@ -216,7 +225,7 @@ function App() {
           <div className="file-grid">
             {displayFiles.map((file) => {
               const targetName = getDisplayTarget(file.subject, file.target);
-              const targetColor = getTargetColor(file.subject, targetName);
+              const targetColor = getTargetColor(file.subject, targetName, file.user);
               
               return (
                 <Link 

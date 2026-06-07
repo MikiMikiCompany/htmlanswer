@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BookOpen, Calendar, ChevronRight, FileText, Headphones } from 'lucide-react';
+import { BookOpen, Calendar, ChevronRight, FileText, Headphones, Edit3 } from 'lucide-react';
 import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 import { Link } from 'react-router-dom';
 import { db } from './firebase';
@@ -28,7 +28,11 @@ function getDisplayTarget(subject: string, rawTarget: string) {
   return name;
 }
 
-function getTargetColor(subject: string, displayTarget: string) {
+function getTargetColor(subject: string, displayTarget: string, user?: string) {
+  if (user === 'user2' || user === 'へー') return '#10b981'; // green
+  if (user === 'user1' || user === 'チャンココ') return '#3b82f6'; // blue
+  if (user === 'user3' || user === 'みき') return '#f43f5e'; // pink
+
   const s = subject.toLowerCase();
   if (s === 'kanji' || s === 'math' || s === 'science') {
     return '#3b82f6'; // blue
@@ -47,6 +51,7 @@ interface QuestionFile {
   rawDate?: string;
   subject: string;
   target: string;
+  user?: string;
   isToday: boolean;
   hasAudio: boolean;
   hasPdf: boolean;
@@ -98,6 +103,7 @@ export default function QuestionList() {
             rawDate: rawDate,
             subject: data.subject || '',
             target: data.target || '',
+            user: data.user || '',
             isToday: rawDate === todayStr,
             hasAudio: !!data.audioData || !!data.audioUrl,
             hasPdf: !!data.pdfData || !!data.pdfUrl,
@@ -113,9 +119,8 @@ export default function QuestionList() {
     };
     
     fetchQuestions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-
 
   const displayFiles = files.filter(f => {
     if (filterDate === 'ALL') return true;
@@ -232,15 +237,29 @@ export default function QuestionList() {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '1rem' }}>
                   {otherFiles.map((file) => {
                     let subjectName = file.subject;
-                    if (subjectName === 'kanji') subjectName = '漢字';
-                    if (subjectName === 'vocab') subjectName = '英単語';
-                    if (subjectName === 'english_study') subjectName = '英語構文';
-                    if (subjectName === 'english') subjectName = '英語';
-                    if (subjectName === 'math') subjectName = '算数';
-                    if (subjectName === 'science') subjectName = '理科';
+                    if (file.subject === 'english' && file.target.includes('リスニング')) subjectName = '英語リスニング';
+                    else if (file.subject === 'english' || file.subject === 'english_study') subjectName = '英語';
+                    else if (file.subject === 'vocab') subjectName = '英単語';
+                    else if (file.subject === 'math') subjectName = '算数';
+                    else if (file.subject === 'math_jhs') subjectName = '中学数学';
+                    else if (file.subject === 'kanji') subjectName = '漢字';
+                    else if (file.subject === 'science') subjectName = '理科';
+                    
+                    let IconComponent = FileText;
+                    let iconColorClass = "text-gray-500";
+                    if (file.subject === 'english' || file.subject === 'vocab' || file.subject === 'english_study') {
+                      IconComponent = BookOpen;
+                      iconColorClass = "text-blue-500";
+                    } else if (file.subject === 'math' || file.subject === 'math_jhs') {
+                      IconComponent = FileText;
+                      iconColorClass = "text-purple-500";
+                    } else if (file.subject === 'kanji') {
+                      IconComponent = Edit3;
+                      iconColorClass = "text-pink-500";
+                    }
                     
                     const targetName = getDisplayTarget(file.subject, file.target);
-                    const targetColor = getTargetColor(file.subject, targetName);
+                    const targetColor = getTargetColor(file.subject, targetName, file.user);
                     
                     return (
                       <Link 
@@ -251,7 +270,7 @@ export default function QuestionList() {
                       >
                         <div className="small-card-left">
                           <div className="small-icon-wrapper">
-                            <FileText size={18} color="#6b7280" />
+                            <IconComponent size={18} className={iconColorClass} />
                           </div>
                           <div>
                             <h3 className="small-subject-title">{subjectName}</h3>

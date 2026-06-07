@@ -25,7 +25,7 @@ export default function Home() {
         const response = await fetch(`https://syakai.vercel.app/api/progress?t=${Date.now()}`);
         if (response.ok) {
           const data = await response.json();
-          const pending = Object.values(data).some((item: any) => item.status === 'created');
+          const pending = Object.values(data).some((item: unknown) => (item as { status?: string })?.status === 'created');
           setHasPendingSyakai(pending);
         }
       } catch (error) {
