@@ -24,10 +24,8 @@ export default function PasswordLock({ onUnlock }: PasswordLockProps) {
 
   useEffect(() => {
     const fetchPassword = async () => {
-      const today = new Date();
-      const dateStr = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
       try {
-        const docRef = doc(db, 'daily_passwords', dateStr);
+        const docRef = doc(db, 'settings', 'master_password');
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           setTargetPassword(docSnap.data().password);
@@ -58,13 +56,11 @@ export default function PasswordLock({ onUnlock }: PasswordLockProps) {
     const newInput = [...currentInput, id];
     setCurrentInput(newInput);
 
-    if (newInput.length === 3) {
+    if (newInput.length === 6) {
       // Check password
       if (newInput.join(',') === targetPassword.join(',')) {
         // Unlock
-        const today = new Date();
-        const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-        sessionStorage.setItem('unlocked_date', todayStr);
+        localStorage.setItem('saved_master_password', JSON.stringify(newInput));
         onUnlock();
       } else {
         // Error
@@ -95,12 +91,12 @@ export default function PasswordLock({ onUnlock }: PasswordLockProps) {
       <div className="lock-box">
         <div className="lock-title">本日のパスワード</div>
         <div className="lock-subtitle">
-          {targetPassword.length === 0 ? "問題を作成するとパスワードが設定されます" : "キャラクターを順番に3つ選んでね"}
+          {targetPassword.length === 0 ? "パスワードが設定されていません" : "キャラクターを順番に6つ選んでね"}
         </div>
 
         {/* Input indicators */}
         <div className="input-indicators">
-          {[0, 1, 2].map((idx) => {
+          {[0, 1, 2, 3, 4, 5].map((idx) => {
             const charId = currentInput[idx];
             const char = charId ? CHARACTERS.find(c => c.id === charId) : null;
             
@@ -124,7 +120,7 @@ export default function PasswordLock({ onUnlock }: PasswordLockProps) {
             <button
               key={char.id}
               onClick={() => handleCharClick(char.id)}
-              disabled={currentInput.length >= 3 || error}
+              disabled={currentInput.length >= 6 || error}
               className="char-btn"
             >
               <img src={char.src} alt={char.name} className="char-img" />

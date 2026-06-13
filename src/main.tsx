@@ -13,15 +13,17 @@ import './index.css'
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/questions" element={<QuestionList />} />
-        <Route path="/questions/view/:id" element={<QuestionViewer />} />
-        <Route path="/explanations" element={<ExplanationList />} />
-        <Route path="/explanations/view/:id" element={<AnswerViewer />} />
-        <Route path="/answers" element={<AuthWrapper><App /></AuthWrapper>} />
-        <Route path="/view/:id" element={<AuthWrapper><AnswerViewer /></AuthWrapper>} />
-      </Routes>
+      <AuthWrapper>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/questions" element={<QuestionList />} />
+          <Route path="/questions/view/:id" element={<QuestionViewer />} />
+          <Route path="/explanations" element={<ExplanationList />} />
+          <Route path="/explanations/view/:id" element={<AnswerViewer />} />
+          <Route path="/answers" element={<App />} />
+          <Route path="/view/:id" element={<AnswerViewer />} />
+        </Routes>
+      </AuthWrapper>
     </BrowserRouter>
   </StrictMode>,
 )
