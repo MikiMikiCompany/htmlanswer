@@ -123,7 +123,7 @@ function App() {
           const rawDate = data.date || '';
           const displayDate = rawDate.length === 8 ? `${rawDate.substring(0, 4)}/${rawDate.substring(4, 6)}/${rawDate.substring(6, 8)}` : rawDate;
           
-          if (data.target !== '文法解説' && data.subject !== 'evaluation' && data.subject !== 'math_explain' && data.subject !== 'science_explain' && data.subject !== 'english_explain' && data.subject !== 'math_jhs_explain') {
+          if (data.target !== '文法解説' && data.subject !== 'evaluation' && data.subject !== 'math_explain' && data.subject !== 'science_explain' && data.subject !== 'english_explain' && data.subject !== 'math_jhs_explain' && data.subject !== 'it_law_explain') {
             fetchedFiles.push({
               id: doc.id,
               date: displayDate,

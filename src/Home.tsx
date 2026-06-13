@@ -9,6 +9,7 @@ export default function Home() {
   const [hasPendingSyakai, setHasPendingSyakai] = useState(false);
   const [hasPendingEnglish, setHasPendingEnglish] = useState(false);
   const [hasPendingMathJhs, setHasPendingMathJhs] = useState(false);
+  const [hasPendingItLaw, setHasPendingItLaw] = useState(false);
 
   const playSyakaiAudio = () => {
     try {
@@ -75,9 +76,31 @@ export default function Home() {
       }
     };
 
+    const checkItLawProgress = async () => {
+      try {
+        const q = query(
+          collection(db, 'answers'),
+          where('subject', '==', 'it_law_explain')
+        );
+        const querySnapshot = await getDocs(q);
+        
+        let pending = false;
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          if (data.isRead === false && data.user === 'へー') {
+            pending = true;
+          }
+        });
+        setHasPendingItLaw(pending);
+      } catch (error) {
+        console.error("Failed to fetch it_law progress:", error);
+      }
+    };
+
     checkSyakaiProgress();
     checkEnglishProgress();
     checkMathJhsProgress();
+    checkItLawProgress();
   }, []);
   return (
     <div className="app-container">
@@ -169,6 +192,32 @@ export default function Home() {
               <div style={{ fontSize: '2.5rem', lineHeight: 1 }}>📐</div>
               <div>
                 <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 'bold' }}>へー、中学数学が出題されているから読んでおけ。</h3>
+                <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.95rem', opacity: 0.9 }}>解説メニューからエンタメ授業を確認するのだ</p>
+              </div>
+            </div>
+          </Link>
+        )}
+
+        {hasPendingItLaw && (
+          <Link 
+            to="/explanations"
+            style={{ width: '100%', marginBottom: '1rem', display: 'block', textDecoration: 'none' }}
+          >
+            <div style={{ 
+              background: 'linear-gradient(135deg, #fcd34d, #f59e0b)', 
+              borderRadius: '16px', 
+              padding: '1.2rem', 
+              color: '#78350f',
+              boxShadow: '0 4px 15px rgba(245, 158, 11, 0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '1rem',
+              border: '2px solid #d97706',
+              transition: 'transform 0.2s'
+            }}>
+              <div style={{ fontSize: '2.5rem', lineHeight: 1 }}>🛡️</div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 'bold' }}>へー、IT・AIセキュリティの授業が届いているぞ。</h3>
                 <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.95rem', opacity: 0.9 }}>解説メニューからエンタメ授業を確認するのだ</p>
               </div>
             </div>
