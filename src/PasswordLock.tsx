@@ -89,9 +89,18 @@ export default function PasswordLock({ onUnlock }: PasswordLockProps) {
   return (
     <div className="lock-container">
       <div className="lock-box">
-        <div className="lock-title">本日のパスワード</div>
+        <div className="lock-title">マスターパスワード</div>
         <div className="lock-subtitle">
-          {targetPassword.length === 0 ? "パスワードが設定されていません" : "キャラクターを順番に6つ選んでね"}
+          {targetPassword.length === 0 ? (
+            "パスワードが設定されていません"
+          ) : (
+            <>
+              <div>6つのキャラクターを順番に選んでね！</div>
+              <div style={{ fontSize: '0.75rem', marginTop: '0.5rem', color: '#9ca3af' }}>
+                一度正解すると、次からは自動で入れるよ！
+              </div>
+            </>
+          )}
         </div>
 
         {/* Input indicators */}
