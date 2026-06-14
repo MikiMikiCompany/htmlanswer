@@ -60,7 +60,11 @@ export default function PasswordLock({ onUnlock }: PasswordLockProps) {
       // Check password
       if (newInput.join(',') === targetPassword.join(',')) {
         // Unlock
-        localStorage.setItem('saved_master_password', JSON.stringify(newInput));
+        // try {
+        //   localStorage.setItem('saved_master_password', JSON.stringify(newInput));
+        // } catch (e) {
+        //   console.warn("Failed to save master password to localStorage:", e);
+        // }
         onUnlock();
       } else {
         // Error

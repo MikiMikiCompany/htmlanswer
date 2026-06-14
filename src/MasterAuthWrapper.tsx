@@ -9,6 +9,15 @@ export default function MasterAuthWrapper({ children }: { children: React.ReactN
 
   useEffect(() => {
     const checkAuth = async () => {
+      // Android等のスマホアプリ内ブラウザ(WebView)からのアクセスの場合はパスワードをスキップ
+      const ua = navigator.userAgent || '';
+      const isSmartphoneApp = /wv|WebView|Android.*Version/i.test(ua);
+      if (isSmartphoneApp) {
+        setIsAuthenticated(true);
+        setLoading(false);
+        return;
+      }
+
       try {
         const docRef = doc(db, 'settings', 'master_password');
         const docSnap = await getDoc(docRef);

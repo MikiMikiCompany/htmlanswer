@@ -64,7 +64,11 @@ export default function PasswordLock({ onUnlock }: PasswordLockProps) {
         // Unlock
         const today = new Date();
         const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-        sessionStorage.setItem('unlocked_date', todayStr);
+        // try {
+        //   sessionStorage.setItem('unlocked_date', todayStr);
+        // } catch (e) {
+        //   console.warn("Failed to save to sessionStorage:", e);
+        // }
         onUnlock();
       } else {
         // Error
