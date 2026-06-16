@@ -62,13 +62,6 @@ export default function PasswordLock({ onUnlock }: PasswordLockProps) {
       // Check password
       if (newInput.join(',') === targetPassword.join(',')) {
         // Unlock
-        const today = new Date();
-        const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-        // try {
-        //   sessionStorage.setItem('unlocked_date', todayStr);
-        // } catch (e) {
-        //   console.warn("Failed to save to sessionStorage:", e);
-        // }
         onUnlock();
       } else {
         // Error
