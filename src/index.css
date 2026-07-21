@@ -490,15 +490,46 @@ h1 {
 }
 
 .home-card.blue:hover .home-card-arrow { color: #60a5fa; }
-.home-card.red:hover .home-card-arrow { color: #f87171; }
-.home-card.green:hover .home-card-arrow { color: #4ade80; }
-
-@media (max-width: 640px) {
-  .home-card {
-    flex-direction: column;
-    text-align: center;
-    padding: 1.5rem;
-    gap: 1rem;
+  .home-card.red:hover .home-card-arrow { color: #f87171; }
+  .home-card.green:hover .home-card-arrow { color: #4ade80; }
+  
+  @media (max-width: 640px) {
+    .home-card {
+      flex-direction: column;
+      text-align: center;
+      padding: 1.5rem;
+      gap: 1rem;
+    }
+    .home-card-arrow { display: none; }
   }
-  .home-card-arrow { display: none; }
-}
+  
+  /* Print Styles */
+  @media print {
+    body {
+      background: transparent !important;
+    }
+    .background-shapes {
+      display: none !important;
+    }
+    .header, .controls, .header-content {
+      display: none !important;
+    }
+    .viewer-header, button, .back-button, .answer-header {
+      display: none !important;
+    }
+    #root, body, html {
+      height: auto !important;
+      min-height: auto !important;
+    }
+    .viewer-container, .viewer-content {
+      height: auto !important;
+      display: block !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+    .viewer-content iframe, iframe {
+      height: 100% !important;
+      min-height: 100vh !important;
+      display: block !important;
+    }
+  }

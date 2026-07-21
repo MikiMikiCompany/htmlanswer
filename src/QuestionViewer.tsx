@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from './firebase';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Printer } from 'lucide-react';
+import { useRef } from 'react';
 import './index.css';
 
 export default function QuestionViewer() {
@@ -12,6 +13,15 @@ export default function QuestionViewer() {
   const [pdfData, setPdfData] = useState<string | null>(null);
   const [isPdfUrl, setIsPdfUrl] = useState<boolean>(false);
   const [loading, setLoading] = useState(true);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  const handlePrint = () => {
+    if (iframeRef.current && iframeRef.current.contentWindow) {
+      iframeRef.current.contentWindow.print();
+    } else {
+      window.print();
+    }
+  };
 
   useEffect(() => {
     const fetchContent = async () => {
@@ -69,12 +79,24 @@ export default function QuestionViewer() {
 
   return (
     <div className="viewer-container">
-      <header className="viewer-header">
-        <Link to="/questions" className="back-button">
-          <ArrowLeft size={20} />
-          <span>戻る</span>
-        </Link>
-        <div className="viewer-title">問題確認</div>
+      <header className="viewer-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <Link to="/questions" className="back-button">
+            <ArrowLeft size={20} />
+            <span>戻る</span>
+          </Link>
+          <div className="viewer-title" style={{ margin: 0 }}>問題確認</div>
+        </div>
+        {!pdfData && (
+          <button 
+            onClick={handlePrint}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', borderRadius: '8px', border: '1px solid #e5e7eb', backgroundColor: 'white', cursor: 'pointer', color: '#4b5563' }}
+            title="印刷する"
+          >
+            <Printer size={18} />
+            <span style={{ fontSize: '0.875rem', fontWeight: '500' }}>印刷</span>
+          </button>
+        )}
       </header>
 
       <main className="viewer-content" style={{ display: 'flex', flexDirection: 'column', height: pdfData ? '85vh' : 'auto' }}>
@@ -94,10 +116,11 @@ export default function QuestionViewer() {
         ) : (
           <div style={{ flex: 1, width: '100%', backgroundColor: '#fff', position: 'relative', borderRadius: '12px', overflow: 'hidden', minHeight: '600px' }}>
             <iframe
+              ref={iframeRef}
               title="Question Content"
               srcDoc={htmlContent}
               style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 'none' }}
-              sandbox="allow-same-origin allow-scripts"
+              sandbox="allow-same-origin allow-scripts allow-modals"
             />
           </div>
         )}

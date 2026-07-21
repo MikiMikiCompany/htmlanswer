@@ -2,13 +2,22 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from './firebase';
-import { ArrowLeft } from 'lucide-react';
-
+import { ArrowLeft, Printer } from 'lucide-react';
+import { useRef } from 'react';
 export default function AnswerViewer() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [htmlContent, setHtmlContent] = useState<string>('');
   const [loading, setLoading] = useState(true);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  const handlePrint = () => {
+    if (iframeRef.current && iframeRef.current.contentWindow) {
+      iframeRef.current.contentWindow.print();
+    } else {
+      window.print();
+    }
+  };
 
   useEffect(() => {
     const fetchContent = async () => {
@@ -80,21 +89,32 @@ export default function AnswerViewer() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', backgroundColor: '#f9fafb' }}>
-      <div style={{ backgroundColor: '#fff', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)', padding: '0.75rem 1rem', display: 'flex', alignItems: 'center', gap: '0.75rem', position: 'relative', zIndex: 10 }}>
+      <div className="answer-header" style={{ backgroundColor: '#fff', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)', padding: '0.75rem 1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative', zIndex: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <button 
+            onClick={() => navigate(-1)} 
+            style={{ padding: '0.5rem', borderRadius: '9999px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4b5563', backgroundColor: 'transparent', border: 'none', cursor: 'pointer' }}
+          >
+            <ArrowLeft size={24} />
+          </button>
+          <h1 style={{ fontSize: '1.125rem', fontWeight: 'bold', color: '#1f2937', margin: 0 }}>解答の確認</h1>
+        </div>
         <button 
-          onClick={() => navigate(-1)} 
-          style={{ padding: '0.5rem', borderRadius: '9999px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4b5563', backgroundColor: 'transparent', border: 'none', cursor: 'pointer' }}
+          onClick={handlePrint}
+          style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', borderRadius: '8px', border: '1px solid #e5e7eb', backgroundColor: 'white', cursor: 'pointer', color: '#4b5563' }}
+          title="印刷する"
         >
-          <ArrowLeft size={24} />
+          <Printer size={18} />
+          <span style={{ fontSize: '0.875rem', fontWeight: '500' }}>印刷</span>
         </button>
-        <h1 style={{ fontSize: '1.125rem', fontWeight: 'bold', color: '#1f2937', margin: 0 }}>解答の確認</h1>
       </div>
       <div style={{ flex: 1, width: '100%', backgroundColor: '#fff', position: 'relative' }}>
         <iframe
+          ref={iframeRef}
           title="Answer Content"
           srcDoc={htmlContent}
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 'none' }}
-          sandbox="allow-same-origin allow-scripts"
+          sandbox="allow-same-origin allow-scripts allow-modals"
         />
       </div>
     </div>
