@@ -4,12 +4,15 @@ import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from './firebase';
 import { ArrowLeft, Printer } from 'lucide-react';
 import { useRef } from 'react';
+import { isEnglishGrammarExplanation, useReadingTelemetry } from './useReadingTelemetry';
 export default function AnswerViewer() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [htmlContent, setHtmlContent] = useState<string>('');
   const [loading, setLoading] = useState(true);
+  const [trackReading, setTrackReading] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  useReadingTelemetry(id, trackReading, iframeRef, htmlContent);
 
   const handlePrint = () => {
     if (iframeRef.current && iframeRef.current.contentWindow) {
@@ -28,6 +31,7 @@ export default function AnswerViewer() {
         
         if (docSnap.exists()) {
           const data = docSnap.data();
+          setTrackReading(isEnglishGrammarExplanation(data));
           
           if ((data.subject === 'english_explain' || data.subject === 'math_jhs_explain') && data.isRead === false) {
             try {
